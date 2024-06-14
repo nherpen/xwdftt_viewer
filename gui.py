@@ -11,12 +11,12 @@ def donothing():
     pass
 
 class FingerprintViewerGui:
-    def __init__(self):
+    def __init__(self) -> None:
         # self.WINDOW_SIZE = (750, 700)
         self.TITLE = "Fingerprint Viewer"
         self.construct_gui()
 
-    def construct_gui(self):
+    def construct_gui(self) -> None:
         self.root = Tk()
         self.root.geometry("750x700")
         self.root.resizable(False, False)
@@ -95,7 +95,7 @@ class FingerprintViewerGui:
         self.root.config(menu=self.menubar)
         self.root.mainloop()
     
-    def load_fingerprint(self):
+    def load_fingerprint(self) -> None:
         self.pickle_file = Path(filedialog.askopenfilename())
 
         with open(self.pickle_file, 'rb') as f:
@@ -107,26 +107,35 @@ class FingerprintViewerGui:
         self.machine = pickle_path_parts[1]
         self.date = "_".join(pickle_path_parts[2:5])
 
-        # Update GUI
-            # Update metadata
+        self.update_gui_upon_fingerprint_load()
+
+    def update_gui_upon_fingerprint_load(self) -> None:
+        # Update metadata labels
         self.fingerprint_name_label.config(text=f"Name:\t\t\t{self.fingerprint_name}")
         self.machine_label.config(text=f"Machine:\t\t{self.machine}")
         self.date_label.config(text=f"Date:\t\t\t{self.date}")
 
-            # Update TreeView
+        # Update TreeView
         for peripheral in self.fingerprint.keys():
             test_cycle_expandable = dict.fromkeys(self.fingerprint[peripheral])
             for test_cycle in self.fingerprint[peripheral].keys():
                 test_cycle_expandable[test_cycle] = self.trees[peripheral].insert("", END, text=test_cycle)
                 for signal in self.fingerprint[peripheral][test_cycle]["cycle_1"].columns:
                     self.trees[peripheral].insert(test_cycle_expandable[test_cycle], END, text=signal)
-                    self.trees[peripheral].bind("<Double-1>", lambda event, p=peripheral: self.update_figure(p))
+                    self.trees[peripheral].bind("<<TreeviewSelect>>", lambda event, p=peripheral: self.update_figure(p))
     
     def update_figure(self, p):
+        # Get the missing information: test cycle & the selected signal name
         selected_item = self.trees[p].focus()
         test_cycle = self.trees[p].item(self.trees[p].parent(selected_item))["text"]
+
+        # Ignore when not a signal, but a test-cycle is selected
+        if not test_cycle:
+            return
+
         signal_name = self.trees[p].item(selected_item)["text"]
 
+        # Plot the figure
         self.plot.clear()
         for c in [f"cycle_{i}" for i in range(1, 6)]:
             signal = self.fingerprint[p][test_cycle][c][signal_name]
@@ -138,6 +147,5 @@ class FingerprintViewerGui:
         self.canvas.draw()
 
 
-    
 if __name__=="__main__":
     gui = FingerprintViewerGui()
