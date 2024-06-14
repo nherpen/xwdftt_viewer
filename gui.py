@@ -141,6 +141,9 @@ class FingerprintViewerGui:
             signal = self.fingerprint[p][test_cycle][c][signal_name]
             self.plot.plot(signal, color='0.8')
 
+        signal = self.fingerprint[p][test_cycle]["cycle_1"][signal_name]
+        self.plot.plot(signal)
+
         self.plot.set_title(signal.name)
         self.plot.grid()
         self.fig.tight_layout()
