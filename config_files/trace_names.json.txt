@@ -1,0 +1,12 @@
+{
+	"AUR": [
+		{
+			"dndm_name": "WXARfdsafjkadslfjdas",
+			"human_readable_name": "moi signaaltje"
+		},
+		{
+			"dndm_name": "WXARfdsafjfdkadslfjdas",
+			"human_readable_name": "moi signaaltje222"
+		}
+	]
+}
