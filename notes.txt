@@ -1,0 +1,25 @@
+For standalone executable: Use spec file to include assets
+
+Load fingerprint --> Detect pickle or raw --> ask downsample if raw
+
+Load reference data
+
+Refactor A LOT
+
+Unit tests
+
+GUI tests
+
+CI/CD
+
+Figure layout
+
+Hide previous cycle checkbox
+
+Metric for deviation
+
+Indicate metric in treeview
+
+Human readable names of signals
+
+Copy to clipboard functionality

@@ -6,6 +6,9 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy
 from pathlib import Path
 import pickle
+import json
+
+CONFIG_PATH = Path("config_files/exe_config.json")
 
 def donothing():
     pass
@@ -14,7 +17,12 @@ class FingerprintViewerGui:
     def __init__(self) -> None:
         # self.WINDOW_SIZE = (750, 700)
         self.TITLE = "Fingerprint Viewer"
+        self.load_config()
         self.construct_gui()
+    
+    def load_config(self):
+        with open(CONFIG_PATH) as f:
+            self.config = json.load(f)
 
     def construct_gui(self) -> None:
         self.root = Tk()
@@ -108,6 +116,11 @@ class FingerprintViewerGui:
         self.next_cycle_button = Button(self.cycle_frame, text=">", command=self.show_next_cycle)
         self.next_cycle_button.pack(side="right")
 
+                # Checkbox Hide Other Cycles
+        var1 = IntVar()
+        self.hide_cycles_checkbox = Checkbutton(self.controls_frame, text="Hide other cycles", variable=var1, command=self.toggle_show_cycles)
+        self.hide_cycles_checkbox.pack(side="right")
+
         self.root.config(menu=self.menubar)
         self.root.mainloop()
     
@@ -131,13 +144,24 @@ class FingerprintViewerGui:
         self.machine_label.config(text=f"Machine:\t\t{self.machine}")
         self.date_label.config(text=f"Date:\t\t\t{self.date}")
 
+        human_dict = {}
+
         # Update TreeView
         for peripheral in self.fingerprint.keys():
+
             test_cycle_expandable = dict.fromkeys(self.fingerprint[peripheral])
             for test_cycle in self.fingerprint[peripheral].keys():
+
                 test_cycle_expandable[test_cycle] = self.trees[peripheral].insert("", END, text=test_cycle)
                 for signal in self.fingerprint[peripheral][test_cycle]["cycle_1"].columns:
-                    self.trees[peripheral].insert(test_cycle_expandable[test_cycle], END, text=signal)
+
+                    # try:
+                    #     item_text = f"{self.config[signal]} - {signal}"
+                    # except KeyError: # In case human readable name is not found
+                    #     item_text = signal
+                    item_text=signal
+                    
+                    self.trees[peripheral].insert(test_cycle_expandable[test_cycle], END, text=item_text)
                     self.trees[peripheral].bind("<<TreeviewSelect>>", lambda event, p=peripheral: self.show_selected_trace(p))
     
     def show_selected_trace(self, p):
@@ -157,12 +181,14 @@ class FingerprintViewerGui:
 
         self.update_figure(p, self.selected_test_cycle, self.selected_trace, self.selected_cycle)
     
-    def update_figure(self, peripheral, test_cycle, trace_name, cycle):
+    def update_figure(self, peripheral, test_cycle, trace_name, cycle, show_other_cycles=True):
         # Plot the figure
         self.plot.clear()
-        for c in [f"cycle_{i}" for i in range(1, 6)]:
-            trace = self.fingerprint[peripheral][test_cycle][c][trace_name]
-            self.plot.plot(trace, color='0.8')
+
+        if show_other_cycles:
+            for c in [f"cycle_{i}" for i in range(1, 6)]:
+                trace = self.fingerprint[peripheral][test_cycle][c][trace_name]
+                self.plot.plot(trace, color='0.8')
 
         trace = self.fingerprint[peripheral][test_cycle][f"cycle_{cycle}"][trace_name]
         self.plot.plot(trace)
@@ -171,6 +197,8 @@ class FingerprintViewerGui:
         self.plot.grid()
         self.fig.tight_layout()
         self.canvas.draw()
+
+        self.cycle_label.config(text=f"Cycle {self.selected_cycle}")
     
     def show_previous_cycle(self):
         if self.selected_cycle == 1:
@@ -179,7 +207,6 @@ class FingerprintViewerGui:
             self.selected_cycle = self.selected_cycle - 1
         
         self.update_figure(self.selected_peripheral, self.selected_test_cycle, self.selected_trace, self.selected_cycle)
-        self.cycle_label.config(text=f"Cycle {self.selected_cycle}")
 
 
     def show_next_cycle(self):
@@ -189,7 +216,9 @@ class FingerprintViewerGui:
             self.selected_cycle = self.selected_cycle + 1
         
         self.update_figure(self.selected_peripheral, self.selected_test_cycle, self.selected_trace, self.selected_cycle)
-        self.cycle_label.config(text=f"Cycle {self.selected_cycle}")
+    
+    def toggle_show_cycles(self):
+        pass
 
 
 if __name__=="__main__":
