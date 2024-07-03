@@ -50,10 +50,10 @@ class FingerprintViewerGui:
         self.top_frame.pack(side='top', fill='x')
 
             # Metadata labels
-        self.fingerprint_name_label = Label(self.top_frame, text=f"Name:\t\t\t{"default"}")
-        self.date_label = Label(self.top_frame, text=f"Date:\t\t\t{"01/01/2000"}")
-        self.machine_label = Label(self.top_frame, text=f"Machine:\t\t{"fjdskafjads"}")
-        self.config_label = Label(self.top_frame, text=f"Config:\t\t\t{"NXE:3800"}")
+        self.fingerprint_name_label = Label(self.top_frame, text=f"Name:\t\t\t{'default'}")
+        self.date_label = Label(self.top_frame, text=f"Date:\t\t\t{'01/01/2000'}")
+        self.machine_label = Label(self.top_frame, text=f"Machine:\t\t{'fjdskafjads'}")
+        self.config_label = Label(self.top_frame, text=f"Config:\t\t\t{'NXE:3800'}")
 
         self.fingerprint_name_label.grid(row=0, sticky="W")
         self.date_label.grid(row=1, sticky="W")
@@ -195,7 +195,6 @@ class FingerprintViewerGui:
 
         self.plot.set_title(trace_name)
         self.plot.grid()
-        self.fig.tight_layout()
         self.canvas.draw()
 
         self.cycle_label.config(text=f"Cycle {self.selected_cycle}")
