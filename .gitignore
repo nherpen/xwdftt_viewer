@@ -3,6 +3,8 @@
 
 ### Project dir ###
 reference_data/traces/*
+*.pickle
+*.DNDM_data.res
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
